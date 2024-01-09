@@ -10,6 +10,7 @@
     <description>trans</description>
     <modules>
         <module>trans-shorturl</module>
+        <module>trans-analysis</module>
     </modules>
     <properties>
         <java.version>17</java.version>
