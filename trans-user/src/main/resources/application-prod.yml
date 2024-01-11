@@ -3,7 +3,7 @@ server:
 
 trans:
   kafka:
-    ip: localhost
+    ip: trans.kafka
     port: 9092
   snowflake:
     worker:
