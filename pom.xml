@@ -11,6 +11,10 @@
     <modules>
         <module>trans-shorturl</module>
         <module>trans-analysis</module>
+        <module>trans-user</module>
+        <module>trans-message</module>
+        <module>trans-gateway</module>
+        <module>trans-common</module>
     </modules>
     <properties>
         <java.version>17</java.version>
