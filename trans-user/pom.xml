@@ -27,7 +27,7 @@
 
         <dependency>
             <groupId>cc.forim</groupId>
-            <artifactId>armagin-common</artifactId>
+            <artifactId>trans-common</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
