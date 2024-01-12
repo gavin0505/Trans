@@ -57,6 +57,7 @@ spring:
       driver-class-name: com.mysql.cj.jdbc.Driver
       url: jdbc:mysql://localhost:3306/trans?useUnicode=true&characterEncoding=utf8
       username: root
+      password: Bt127#mysql
       # 连接池配置
       initial-size: 5
       min-idle: 5
