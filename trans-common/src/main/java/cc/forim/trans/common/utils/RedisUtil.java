@@ -266,6 +266,36 @@ public class RedisUtil {
     }
 
     /**
+     * 随机从Set中取出一个元素
+     *
+     * @param key 目标键
+     * @return 随机一个元素
+     */
+    public Object sPop(String key) {
+        try {
+            return redisTemplate.opsForSet().pop(key);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * 随机从Set中取出count个元素
+     *
+     * @param key 目标键
+     * @return 随机count个元素
+     */
+    public List<Object> sPop(String key, Long count) {
+        try {
+            return redisTemplate.opsForSet().pop(key, count);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
      * 将数据放入set缓存
      *
      * @param key    键
