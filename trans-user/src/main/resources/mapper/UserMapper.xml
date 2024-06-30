@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cc.forim.trans.user.dao.UserMapper">
+
+    <select id="login" resultType="java.lang.Integer">
+        select id
+        from sys_user
+        where username = #{username}
+          and password = #{password}
+          and deleted = 0
+    </select>
+
+    <update id="updateLogged">
+        update sys_user
+        set logged = #{loggedTime}
+        where id = #{id}
+          and deleted = 0
+    </update>
+
+    <select id="selectUsernameById" resultType="java.lang.String">
+        select username
+        from sys_user
+        where id = #{id}
+          and deleted = 0
+    </select>
+
+    <select id="selectIdByUsername" resultType="java.lang.Integer">
+        select id
+        from sys_user
+        where username = #{username}
+          and deleted = 0
+    </select>
+
+    <select id="selectIdByEmail" resultType="java.lang.Integer">
+        select id
+        from sys_user
+        where email = #{email}
+          and deleted = 0
+    </select>
+
+    <insert id="insertUser">
+        insert into sys_user(username, email, password) value (#{dto.username}, #{dto.email}, #{dto.password})
+    </insert>
+
+    <insert id="insertUserRole">
+        insert into sys_user_role_mapping(sys_user_id, sys_role_id) value (#{id}, #{role})
+    </insert>
+</mapper>

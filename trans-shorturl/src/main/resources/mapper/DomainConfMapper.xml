@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cc.forim.trans.shorturl.dao.DomainConfMapper">
+
+    <select id="selectByDomain" resultType="cc.forim.trans.shorturl.infra.entity.DomainConf">
+        SELECT *
+        FROM domain_conf
+        WHERE deleted = 0
+          AND domain_status = 1
+          AND domain_value = #{domain}
+          AND biz_type = #{bizType}
+    </select>
+    <select id="selectIdByDomainAndProtocol" resultType="cc.forim.trans.shorturl.infra.entity.DomainConf">
+        select id
+        from domain_conf
+        where domain_value = #{domain}
+          and protocol = #{protocol}
+          and biz_type = #{bizType}
+          and domain_status = 1
+          and deleted = 0
+    </select>
+    <select id="selectByDomainStatus" resultType="cc.forim.trans.shorturl.infra.vo.DomainConfSelectionVO">
+        select protocol, domain_value, biz_type
+        from domain_conf
+        where domain_status = 1
+          and deleted = 0
+    </select>
+</mapper>

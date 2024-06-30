@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: trans-user
+  profiles:
+    default: dev
+  cloud:
+    nacos:
+      server-addr: localhost:8848
+      config:
+        name: trans-user
+        file-extension: yml
+        extension-configs:
+          - data-id: email-config.yml
+            group: DEFAULT_GROUP
+            refresh: true
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+  cloud:
+    nacos:
+      config:
+        namespace: trans-dev
+        group: DEFAULT_GROUP
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: test
+  cloud:
+    nacos:
+      config:
+        namespace: trans-test
+        group: DEFAULT_GROUP

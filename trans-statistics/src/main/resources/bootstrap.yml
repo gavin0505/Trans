@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: trans-statistics
+  profiles:
+    default: dev
+  cloud:
+    nacos:
+      server-addr: localhost:8848
+      config:
+        name: trans-statistics
+        file-extension: yml
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+  cloud:
+    nacos:
+      config:
+        namespace: trans-dev
+        group: DEFAULT_GROUP
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: test
+  cloud:
+    nacos:
+      config:
+        namespace: trans-test
+        group: DEFAULT_GROUP

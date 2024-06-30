@@ -6,7 +6,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * @author Gavin Zhang
  * @version V1.0
- * @since 2023/12/30 16:30
  */
 
 @SpringBootApplication

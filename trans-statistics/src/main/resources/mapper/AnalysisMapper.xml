@@ -1,0 +1,469 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cc.forim.trans.statistics.dao.AnalysisMapper">
+
+    <select id="selectAllTimeIntervalAndFrequencyInHour"
+            resultType="cc.forim.trans.statistics.infra.vo.TimeIntervalAndFrequencyVO">
+        select toHour(datetime) as time_interval, count(*) as frequency
+        from analysis
+        group by toHour(datetime)
+        order by frequency desc
+        limit 1
+    </select>
+
+    <select id="selectTimeIntervalAndFrequencyInHourByUrlMapId"
+            resultType="cc.forim.trans.statistics.infra.vo.TimeIntervalAndFrequencyVO">
+        select toHour(datetime) as time_interval, count(*) as frequency
+        from analysis
+        where url_map_id = #{urlMapId}
+          and user_id = #{userId}
+        group by toHour(datetime)
+        order by frequency desc
+        limit 1
+    </select>
+
+    <select id="selectTimeIntervalAndFrequencyInHourByUserId"
+            resultType="cc.forim.trans.statistics.infra.vo.TimeIntervalAndFrequencyVO">
+        select toHour(datetime) as time_interval, count(*) as frequency
+        from analysis
+        where user_id = #{userId}
+        group by toHour(datetime)
+        order by frequency desc
+        limit 1
+    </select>
+
+    <select id="selectAllTimeIntervalAndFrequencyInWeek"
+            resultType="cc.forim.trans.statistics.infra.vo.TimeIntervalAndFrequencyVO">
+        select toDayOfWeek(datetime) as time_interval, count(*) as frequency
+        from analysis
+        group by toDayOfWeek(datetime)
+        order by frequency desc
+        limit 1
+    </select>
+
+    <select id="selectTimeIntervalAndFrequencyInWeekByUrlMapId"
+            resultType="cc.forim.trans.statistics.infra.vo.TimeIntervalAndFrequencyVO">
+        select toDayOfWeek(datetime) as time_interval, count(*) as frequency
+        from analysis
+        where url_map_id = #{urlMapId}
+          and user_id = #{userId}
+        group by toDayOfWeek(datetime)
+        order by frequency
+                desc
+        limit 1
+    </select>
+
+    <select id="selectTimeIntervalAndFrequencyInWeekByUserId"
+            resultType="cc.forim.trans.statistics.infra.vo.TimeIntervalAndFrequencyVO">
+        select toDayOfWeek(datetime) as time_interval, count(*) as frequency
+        from analysis
+        where user_id = #{userId}
+        group by toDayOfWeek(datetime)
+        order by frequency desc
+        limit 1
+    </select>
+
+    <select id="selectTPlusOneTotalCount" resultType="java.lang.Long">
+        select count() as count
+        from analysis
+        where toDate(datetime) >= toDate(#{startDate})
+          and toDate(datetime) &lt; toDate(#{endDate})
+          and url_map_id = #{urlMapId}
+    </select>
+
+    <select id="selectTimeRangeByProvinceTotalCount" resultType="java.lang.Long">
+        select count() as count
+        from analysis
+        where
+        <foreach item="province" collection="provinces" separator=" OR " open="(" close=")">
+            toDate(datetime) >= toDate(#{startDate})
+            and toDate(datetime) &lt;= toDate(#{endDate})
+            and url_map_id = #{urlMapId}
+            and province = #{province}
+        </foreach>
+    </select>
+
+    <select id="selectTimeRangeByCityTotalCount" resultType="java.lang.Long">
+        select count() as count
+        from analysis
+        where
+        <foreach item="city" collection="citys" separator=" OR " open="(" close=")">
+            toDate(datetime) >= toDate(#{startDate})
+            and toDate(datetime) &lt;= toDate(#{endDate})
+            and url_map_id = #{urlMapId}
+            and city = #{city}
+        </foreach>
+    </select>
+
+    <select id="selectTPlusOneSevenDayCount" resultType="cc.forim.trans.statistics.infra.domain.DayRecord">
+        select toDate(datetime) as date, count() as count
+        from analysis
+        where toDate(datetime) &lt; toDate(#{endDate})
+          and toDate(datetime) >= toDate(#{endDate}) - 7
+          and toDate(datetime) >= toDate(#{startDate})
+          and url_map_id = #{urlMapId}
+        group by date
+    </select>
+
+    <select id="getTSevenDaysCountByUserId" resultType="cc.forim.trans.statistics.infra.domain.DayRecord">
+        select toDate(datetime) as date, count() as count
+        from analysis
+        where toDate(datetime) >= today() - interval 6 day
+          and toDate(datetime) &lt;= today()
+          and user_id = #{userId}
+        group by date
+    </select>
+
+    <select id="selectTimeRangeByProvinceSevenDayCount" resultType="cc.forim.trans.statistics.infra.domain.DayRecord">
+        select toDate(datetime) as date, count() as count
+        from analysis
+        where
+        <foreach item="province" collection="provinces" separator=" OR " open="(" close=")">
+            toDate(datetime) &lt;= toDate(#{endDate})
+            and toDate(datetime) >= toDate(#{endDate}) - 7
+            and toDate(datetime) >= toDate(#{startDate})
+            and url_map_id = #{urlMapId}
+            and province = #{province}
+        </foreach>
+        group by date
+    </select>
+
+    <select id="selectTimeRangeByCitySevenDayCount" resultType="cc.forim.trans.statistics.infra.domain.DayRecord">
+        select toDate(datetime) as date, count() as count
+        from analysis
+        where
+        <foreach item="city" collection="citys" separator=" OR " open="(" close=")">
+            toDate(datetime) &lt;= toDate(#{endDate})
+            and toDate(datetime) >= toDate(#{endDate}) - 7
+            and toDate(datetime) >= toDate(#{startDate})
+            and url_map_id = #{urlMapId}
+            and city = #{city}
+        </foreach>
+        group by date
+    </select>
+
+    <select id="selectTPlusOneHourSegmentCount" resultType="cc.forim.trans.statistics.infra.domain.HourOfDay">
+        select toHour(datetime) as hour, count() as count
+        from analysis
+        where toDate(datetime) &lt; toDate(#{endDate})
+          and toDate(datetime) >= toDate(#{startDate})
+          and url_map_id = #{urlMapId}
+        group by hour
+    </select>
+
+    <select id="selectTimeRangeByProvinceHourSegmentCount"
+            resultType="cc.forim.trans.statistics.infra.domain.HourOfDay">
+        select toHour(datetime) as hour, count() as count
+        from analysis
+        where
+        <foreach item="province" collection="provinces" separator=" OR " open="(" close=")">
+            toDate(datetime) &lt;= toDate(#{endDate})
+            and toDate(datetime) >= toDate(#{startDate})
+            and url_map_id = #{urlMapId}
+            and province = #{province}
+        </foreach>
+        group by hour
+    </select>
+
+    <select id="selectTimeRangeByCityHourSegmentCount" resultType="cc.forim.trans.statistics.infra.domain.HourOfDay">
+        select toHour(datetime) as hour, count() as count
+        from analysis
+        where
+        <foreach item="city" collection="citys" separator=" OR " open="(" close=")">
+            toDate(datetime) &lt;= toDate(#{endDate})
+            and toDate(datetime) >= toDate(#{startDate})
+            and url_map_id = #{urlMapId}
+            and city = #{city}
+        </foreach>
+        group by hour
+    </select>
+
+    <select id="selectTPlusOneEveryProvinceCount" resultType="cc.forim.trans.statistics.infra.domain.ProvinceRecord">
+        select province, count(province) as count
+        from analysis
+        where toDate(datetime) &lt; toDate(#{endDate})
+          and toDate(datetime) >= toDate(#{startDate})
+          and url_map_id = #{urlMapId}
+        group by province
+    </select>
+
+    <select id="selectTimeRangeByProvinceEveryProvinceCount"
+            resultType="cc.forim.trans.statistics.infra.domain.ProvinceRecord">
+        select province, count(province) as count
+        from analysis
+        where
+        <foreach item="province" collection="provinces" separator=" OR " open="(" close=")">
+            toDate(datetime) &lt;= toDate(#{endDate})
+            and toDate(datetime) >= toDate(#{startDate})
+            and url_map_id = #{urlMapId}
+            and province = #{province}
+        </foreach>
+        group by province
+    </select>
+
+    <select id="selectTimeRangeByCityEveryProvinceCount"
+            resultType="cc.forim.trans.statistics.infra.domain.ProvinceRecord">
+        select province, count(province) as count
+        from analysis
+        where
+        <foreach item="city" collection="citys" separator=" OR " open="(" close=")">
+            toDate(datetime) &lt;= toDate(#{endDate})
+            and toDate(datetime) >= toDate(#{startDate})
+            and url_map_id = #{urlMapId}
+            and city = #{city}
+        </foreach>
+        group by province
+    </select>
+
+    <select id="selectTPlusOneTopXCityCount" resultType="cc.forim.trans.statistics.infra.domain.CityRecord">
+        select city, count(city) as count
+        from analysis
+        where toDate(datetime) &lt; toDate(#{endDate})
+          and toDate(datetime) >= toDate(#{startDate})
+          and url_map_id = #{urlMapId}
+        group by city
+        order by count desc
+        limit #{x}
+    </select>
+
+    <select id="selectTimeRangeByProvinceTopXCityCount" resultType="cc.forim.trans.statistics.infra.domain.CityRecord">
+        select city, count(city) as count
+        from analysis
+        where
+        <foreach item="province" collection="provinces" separator=" OR " open="(" close=")">
+            toDate(datetime) &lt;= toDate(#{endDate})
+            and toDate(datetime) >= toDate(#{startDate})
+            and url_map_id = #{urlMapId}
+            and province = #{province}
+        </foreach>
+        group by city
+        order by count desc
+        limit #{x}
+    </select>
+
+    <select id="selectTimeRangeByCityTopXCityCount" resultType="cc.forim.trans.statistics.infra.domain.CityRecord">
+        select city, count(city) as count
+        from analysis
+        where
+        <foreach item="city" collection="citys" separator=" OR " open="(" close=")">
+            toDate(datetime) &lt;= toDate(#{endDate})
+            and toDate(datetime) >= toDate(#{startDate})
+            and url_map_id = #{urlMapId}
+            and city = #{city}
+        </foreach>
+        group by city
+        order by count desc
+        limit #{x}
+    </select>
+
+    <select id="selectTPlusOneXWeeksCount" resultType="cc.forim.trans.statistics.infra.domain.WeekRecord">
+        SELECT toStartOfWeek(datetime) AS week_start,
+               COUNT(*)                AS count
+        FROM analysis
+        WHERE url_map_id = #{urlMapId}
+          and toDate(datetime) >= toDate(#{endDate}) - INTERVAL #{x} WEEK
+          and toDate(datetime) &lt; toDate(#{endDate})
+          and toDate(datetime) >= toDate(#{startDate})
+        GROUP BY week_start
+        ORDER BY week_start
+    </select>
+
+    <select id="selectTimeRangeByProvinceXWeeksCount" resultType="cc.forim.trans.statistics.infra.domain.WeekRecord">
+        SELECT toStartOfWeek(datetime) AS week_start,
+        COUNT(*) AS count
+        FROM analysis
+        WHERE
+        <foreach item="province" collection="provinces" separator=" OR " open="(" close=")">
+            url_map_id = #{urlMapId}
+            and toDate(datetime) >= toDate(#{endDate}) - INTERVAL #{x} WEEK
+            and toDate(datetime) &lt;= toDate(#{endDate})
+            and toDate(datetime) >= toDate(#{startDate})
+            and province = #{province}
+        </foreach>
+        GROUP BY week_start
+        ORDER BY week_start
+    </select>
+
+    <select id="selectTimeRangeByCityXWeeksCount" resultType="cc.forim.trans.statistics.infra.domain.WeekRecord">
+        SELECT toStartOfWeek(datetime) AS week_start,
+        COUNT(*) AS count
+        FROM analysis
+        WHERE
+        <foreach item="city" collection="citys" separator=" OR " open="(" close=")">
+            url_map_id = #{urlMapId}
+            and toDate(datetime) >= toDate(#{endDate}) - INTERVAL #{x} WEEK
+            and toDate(datetime) &lt;= toDate(#{endDate})
+            and toDate(datetime) >= toDate(#{startDate})
+            and city = #{city}
+        </foreach>
+        GROUP BY week_start
+        ORDER BY week_start
+    </select>
+
+    <select id="selectTPlusOneEveryBrowserCount" resultType="cc.forim.trans.statistics.infra.domain.BrowserRecord">
+        select browser as browser, count(browser) as count
+        from analysis
+        where toDate(datetime) &lt; toDate(#{endDate})
+          and toDate(datetime) >= toDate(#{startDate})
+          and url_map_id = #{urlMapId}
+        group by browser
+        order by count desc
+    </select>
+
+    <select id="selectTimeRangeByProvinceEveryBrowserCount"
+            resultType="cc.forim.trans.statistics.infra.domain.BrowserRecord">
+        select browser as browser, count(browser) as count
+        from analysis
+        where
+        <foreach item="province" collection="provinces" separator=" OR " open="(" close=")">
+            toDate(datetime) &lt;= toDate(#{endDate})
+            and toDate(datetime) >= toDate(#{startDate})
+            and url_map_id = #{urlMapId}
+            and province = #{province}
+        </foreach>
+        group by browser
+        order by count desc
+    </select>
+
+    <select id="selectTimeRangeByCityEveryBrowserCount"
+            resultType="cc.forim.trans.statistics.infra.domain.BrowserRecord">
+        select browser as browser, count(browser) as count
+        from analysis
+        where
+        <foreach item="city" collection="citys" separator=" OR " open="(" close=")">
+            toDate(datetime) &lt;= toDate(#{endDate})
+            and toDate(datetime) >= toDate(#{startDate})
+            and url_map_id = #{urlMapId}
+            and city = #{city}
+        </foreach>
+        group by browser
+        order by count desc
+    </select>
+
+    <select id="selectTPlusOneEveryOSCount" resultType="cc.forim.trans.statistics.infra.domain.OSRecord">
+        select os as os, count(browser) as count
+        from analysis
+        where toDate(datetime) &lt; toDate(#{endDate})
+          and toDate(datetime) >= toDate(#{startDate})
+          and url_map_id = #{urlMapId}
+        group by os
+        order by count desc
+    </select>
+
+    <select id="selectTimeRangeByProvinceEveryOSCount" resultType="cc.forim.trans.statistics.infra.domain.OSRecord">
+        select os as os, count(browser) as count
+        from analysis
+        where
+        <foreach item="province" collection="provinces" separator=" OR " open="(" close=")">
+            toDate(datetime) &lt;= toDate(#{endDate})
+            and toDate(datetime) >= toDate(#{startDate})
+            and url_map_id = #{urlMapId}
+            and province = #{province}
+        </foreach>
+        group by os
+        order by count desc
+    </select>
+
+    <select id="selectTimeRangeByCityEveryOSCount" resultType="cc.forim.trans.statistics.infra.domain.OSRecord">
+        select os as os, count(browser) as count
+        from analysis
+        where
+        <foreach item="city" collection="citys" separator=" OR " open="(" close=")">
+            toDate(datetime) &lt;= toDate(#{endDate})
+            and toDate(datetime) >= toDate(#{startDate})
+            and url_map_id = #{urlMapId}
+            and city = #{city}
+        </foreach>
+        group by os
+        order by count desc
+    </select>
+
+    <select id="selectTPlusOnePhoneAndPCCount" resultType="cc.forim.trans.statistics.infra.domain.PhoneAndPCRecord">
+        select count(mobile = 0) as pcCount, count(mobile = 1) as phoneCount
+        from analysis
+        where toDate(datetime) &lt; toDate(#{endDate})
+          and toDate(datetime) >= toDate(#{startDate})
+          and url_map_id = #{urlMapId}
+    </select>
+
+    <select id="selectTimeRangeByProvincePhoneAndPCCount"
+            resultType="cc.forim.trans.statistics.infra.domain.PhoneAndPCRecord">
+        select count(mobile = 0) as pcCount, count(mobile = 1) as phoneCount
+        from analysis
+        where
+        <foreach item="province" collection="provinces" separator=" OR " open="(" close=")">
+            toDate(datetime) &lt;= toDate(#{endDate})
+            and toDate(datetime) >= toDate(#{startDate})
+            and url_map_id = #{urlMapId}
+            and province = #{province}
+        </foreach>
+    </select>
+
+    <select id="selectTimeRangeByCityPhoneAndPCCount"
+            resultType="cc.forim.trans.statistics.infra.domain.PhoneAndPCRecord">
+        select count(mobile = 0) as pcCount, count(mobile = 1) as phoneCount
+        from analysis
+        where
+        <foreach item="city" collection="citys" separator=" OR " open="(" close=")">
+            toDate(datetime) &lt;= toDate(#{endDate})
+            and toDate(datetime) >= toDate(#{startDate})
+            and url_map_id = #{urlMapId}
+            and city = #{city}
+        </foreach>
+    </select>
+
+    <select id="selectTPlusOneEveryISPCount" resultType="cc.forim.trans.statistics.infra.domain.ISPRecord">
+        select isp as isp, count(isp) as count
+        from analysis
+        where toDate(datetime) &lt;= toDate(#{endDate})
+          and toDate(datetime) >= toDate(#{startDate})
+          and url_map_id = #{urlMapId}
+        group by isp
+    </select>
+
+    <select id="selectTimeRangeByProvinceEveryISPCount" resultType="cc.forim.trans.statistics.infra.domain.ISPRecord">
+        select isp as isp, count(isp) as count
+        from analysis
+        where
+        <foreach item="province" collection="provinces" separator=" OR " open="(" close=")">
+            toDate(datetime) &lt;= toDate(#{endDate})
+            and toDate(datetime) >= toDate(#{startDate})
+            and url_map_id = #{urlMapId}
+            and province = #{province}
+        </foreach>
+        group by isp
+    </select>
+
+    <select id="selectTimeRangeByCityEveryISPCount" resultType="cc.forim.trans.statistics.infra.domain.ISPRecord">
+        select isp as isp, count(isp) as count
+        from analysis
+        where
+        <foreach item="city" collection="citys" separator=" OR " open="(" close=")">
+            toDate(datetime) &lt;= toDate(#{endDate})
+            and toDate(datetime) >= toDate(#{startDate})
+            and url_map_id = #{urlMapId}
+            and city = #{city}
+        </foreach>
+        group by isp
+    </select>
+
+    <select id="getUrlMapVisitCountByUserId" resultType="java.lang.Long">
+        select count()
+        from analysis
+        where user_id = #{userId}
+    </select>
+
+    <select id="getTodayUrlMapVisitCountById" resultType="java.lang.Long">
+        select count()
+        from analysis
+        where user_id = #{userId}
+          and toDate(datetime) = today()
+    </select>
+
+    <select id="getTodayUrlMapVisitIpCountById" resultType="java.lang.Long">
+        select countDistinct(ip)
+        from analysis
+        where user_id = #{userId}
+          and toDate(datetime) = today()
+    </select>
+</mapper>

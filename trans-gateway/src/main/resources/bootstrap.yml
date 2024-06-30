@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: trans-gateway
+  profiles:
+    default: dev
+  cloud:
+    nacos:
+      server-addr: localhost:8848
+      config:
+        name: trans-gateway
+        file-extension: yml
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+  cloud:
+    nacos:
+      config:
+        namespace: trans-dev
+        group: DEFAULT_GROUP

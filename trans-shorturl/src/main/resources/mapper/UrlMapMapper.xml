@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cc.forim.trans.shorturl.dao.UrlMapMapper">
+
+    <update id="expiredByIds">
+        update url_map set url_status = 2 where id in
+        <foreach item="item" collection="ids" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and deleted = 0
+    </update>
+
+    <update id="updateExpireTimeById">
+        update url_map
+        set expire_time = #{expireTime}
+        where id = #{id}
+          and deleted = 0
+    </update>
+
+    <select id="selectByUrlStatusAndShortUrl" resultType="cc.forim.trans.shorturl.infra.entity.UrlMap">
+        select *
+        from url_map
+        where short_url = #{shortUrl}
+          and url_status = #{status}
+          and deleted = 0
+    </select>
+
+    <select id="selectCountByUrlStatusAndShortUrl">
+        select count(*)
+        from url_map
+        where short_url = #{shortUrl}
+          and url_status = #{status}
+          and deleted = 0
+    </select>
+
+    <select id="selectByUrlStatusAndShortUrlAndLongUrlAndUserId" resultType="cc.forim.trans.shorturl.infra.entity.UrlMap">
+        select *
+        from url_map
+        where short_url = #{shortUrl}
+          and long_url = #{longUrl}
+          and user_id = #{userId}
+          and url_status = #{status}
+          and deleted = 0
+    </select>
+
+    <select id="selectInvalidUpdateUrlMapDomainConfId" resultType="java.lang.Long">
+        select domain_conf_id
+        from url_map
+        where expire_time &lt; #{expiredTime}
+          and url_status = #{status}
+          and deleted = 0
+        group by domain_conf_id
+          </select>
+<select id="selectByLongUrlAndShortUrlAndUserId" resultType="cc.forim.trans.shorturl.infra.entity.UrlMap">
+    select *
+    from url_map
+    where short_url = #{shortUrl}
+      and long_url = #{longUrl}
+      and user_id = #{userId}
+      and deleted = 0
+</select>
+
+    <select id="selectExpiredCompressionCodeByStatusAndBizTypeAndDomain" resultType="java.lang.String">
+        select compression_code
+        from url_map
+        where expire_time &lt; #{expiredTime}
+          and domain_conf_id = #{domainId}
+          and biz_type = #{bizType}
+          and url_status = #{status}
+          and deleted = 0
+    </select>
+</mapper>

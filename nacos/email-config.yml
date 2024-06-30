@@ -1,0 +1,9 @@
+email: 
+    verifyCode: 
+        from: Trans短链接平台<xxx@163.com>
+        user: xxx@163.com
+        password: 123456
+        port: 465
+        host: smtp.163.com
+        sslEnable: true
+        authEnable: true

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cc.forim.trans.shorturl.dao.CompressionCodeMapper">
+
+    <select id="getLatestAvailableCompressionCode" resultType="cc.forim.trans.shorturl.infra.entity.CompressionCode">
+        SELECT *
+        FROM compression_code
+        WHERE code_status = 1
+          AND domain_conf_id = #{domainConfId}
+          AND deleted = 0
+        ORDER BY id
+        LIMIT 1
+    </select>
+
+    <update id="updateByPrimaryKeySelective" parameterType="cc.forim.trans.shorturl.infra.entity.CompressionCode">
+        update compression_code
+        <set>
+            <if test="compressionCode != null">
+                compression_code = #{compressionCode,jdbcType=VARCHAR},
+            </if>
+            <if test="codeStatus != null">
+                code_status = #{codeStatus,jdbcType=TINYINT},
+            </if>
+            <if test="domainConfId != null">
+                domain_conf_id = #{domainConfId,jdbcType=BIGINT},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="editTime != null">
+                edit_time = #{editTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="creator != null">
+                creator = #{creator,jdbcType=INTEGER},
+            </if>
+            <if test="editor != null">
+                editor = #{editor,jdbcType=INTEGER},
+            </if>
+            <if test="deleted != null">
+                deleted = #{deleted,jdbcType=TINYINT},
+            </if>
+            <if test="version != null">
+                version = #{version,jdbcType=BIGINT},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <update id="expiredByCodes" parameterType="java.lang.String">
+        update compression_code set code_status = 3 where compression_code in
+        <foreach item="item" collection="codes" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <select id="hasCompressionCode" resultType="java.lang.Long">
+        select id from compression_code
+                  where compression_code = #{code} and domain_conf_id = #{domainId} and deleted = 0
+    </select>
+
+    <update id="updateCodeStatusById">
+        update compression_code
+        set code_status = #{status}
+        where id = #{id}
+          and deleted = 0
+    </update>
+
+    <select id="selectIdByCodeAndDomainConfId" resultType="java.lang.Long">
+        select id
+        from compression_code
+        where compression_code = #{compressionCode}
+          and domain_conf_id = #{confId}
+          and deleted = 0
+    </select>
+</mapper>

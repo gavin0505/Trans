@@ -23,7 +23,7 @@ public class RedisUtil {
     private RedisTemplate<String, Object> redisTemplate;
 
     /**
-     * 指定缓存失效时间
+     * 指定缓存失效时间(时间大于0)
      *
      * @param key  键
      * @param time 时间(秒)
@@ -34,6 +34,20 @@ public class RedisUtil {
                 redisTemplate.expire(key, time, TimeUnit.SECONDS);
             }
             return true;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * 立即失效
+     *
+     * @param key 键
+     */
+    public Boolean expireNow(String key) {
+        try {
+            return redisTemplate.expire(key, 0L, TimeUnit.SECONDS);
         } catch (Exception e) {
             log.error(e.getMessage());
             return false;
@@ -65,7 +79,6 @@ public class RedisUtil {
         try {
             return redisTemplate.opsForSet().isMember(key, value);
         } catch (Exception e) {
-            e.printStackTrace();
             log.error(e.getMessage());
             return false;
         }
@@ -206,7 +219,7 @@ public class RedisUtil {
         try {
             redisTemplate.opsForHash().put(key, hashKey, value);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
     }
 
@@ -220,7 +233,7 @@ public class RedisUtil {
         try {
             return redisTemplate.opsForHash().get(key, hashKey);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             return null;
         }
     }
@@ -235,7 +248,7 @@ public class RedisUtil {
         try {
             return redisTemplate.opsForHash().delete(key, item);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             return 0L;
         }
     }
@@ -260,7 +273,7 @@ public class RedisUtil {
         try {
             return redisTemplate.opsForSet().members(key);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             return null;
         }
     }
@@ -275,7 +288,7 @@ public class RedisUtil {
         try {
             return redisTemplate.opsForSet().pop(key);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             return null;
         }
     }
@@ -290,7 +303,7 @@ public class RedisUtil {
         try {
             return redisTemplate.opsForSet().pop(key, count);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             return null;
         }
     }
@@ -306,7 +319,7 @@ public class RedisUtil {
         try {
             return redisTemplate.opsForSet().add(key, values);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             return 0L;
         }
     }
@@ -320,7 +333,7 @@ public class RedisUtil {
         try {
             return redisTemplate.opsForSet().size(key);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             return 0L;
         }
     }
@@ -336,7 +349,7 @@ public class RedisUtil {
         try {
             return redisTemplate.opsForSet().remove(key, values);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             return 0L;
         }
     }
@@ -366,6 +379,19 @@ public class RedisUtil {
     }
 
     /**
+     * 有序集合获取，获取指定Score区间内的前count个元素
+     *
+     * @param key   键
+     * @param min   最小score
+     * @param max   最大score
+     * @param count 获取前count个元素
+     * @return score在[min, max]的值，前count个元素
+     */
+    public Set<Object> zRangeByScore(String key, Double min, Double max, Long count) {
+        return redisTemplate.opsForZSet().rangeByScore(key, min, max, 0, count);
+    }
+
+    /**
      * 有序集合获取排名
      *
      * @param key   集合名称
@@ -375,7 +401,7 @@ public class RedisUtil {
         try {
             return redisTemplate.opsForZSet().rank(key, value);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             return 0L;
         }
     }
@@ -391,7 +417,24 @@ public class RedisUtil {
         try {
             return redisTemplate.opsForZSet().remove(key, values);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
+            return 0L;
+        }
+    }
+
+    /**
+     * 移除ZSet指定Score区间内的值
+     *
+     * @param key        键
+     * @param startScore 起始score
+     * @param endScore   终止score
+     * @return 操作条数
+     */
+    public Long zSetDelByScoreRange(String key, Double startScore, Double endScore) {
+        try {
+            return redisTemplate.opsForZSet().removeRangeByScore(key, startScore, endScore);
+        } catch (Exception e) {
+            log.error(e.getMessage());
             return 0L;
         }
     }
@@ -408,8 +451,36 @@ public class RedisUtil {
         try {
             return redisTemplate.opsForZSet().incrementScore(key, item, scores);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             return 0.0;
         }
+    }
+
+    /**
+     * 查看指定Score范围内的ZSet的元数个数
+     *
+     * @param key 键
+     * @param min Score下界
+     * @param max Score上界
+     * @return 记录条数
+     */
+    public Long zSetCount(String key, Double min, Double max) {
+        try {
+            return redisTemplate.opsForZSet().count(key, min, max);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return 0L;
+        }
+    }
+
+    /**
+     * 判断ZSet中是否存在元素
+     *
+     * @param key  zSet表
+     * @param item 元素
+     * @return 结果
+     */
+    public boolean zSetHasItem(String key, String item) {
+        return redisTemplate.opsForZSet().rank(key, item) != null;
     }
 }
